@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Movies App</string>
+    <string name="description_main">you can browse movies and shows by genre, search for
+    specific title, or check out the latest releases</string>
+</resources>

@@ -1,0 +1,87 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# Gradle files
+.gradle/
+build/
+!gradle-wrapper.jar
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+# Log Files
+*.log
+
+# Android Studio project files
+.idea/
+*.iml
+
+# Kotlin specific files
+*.kotlin_metadata
+*.kotlin_module
+
+# Android Studio cache and local history
+*.idea/
+*.gradle/
+*.gnt/
+
+# Files for IntelliJ IDEA
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Keystore files
+*.jks
+*.keystore
+
+# NDK
+/ndk-build/
+
+# External native build folder generated in Android Studio 2.2+
+.externalNativeBuild/
+
+# Gradle files
+.gradle/
+build/
+
+# Firebase config files
+google-services.json
+google-services.xml
+
+# Crashlytics files
+crashlytics-build.properties
+
+# Android Studio Navigation Editor temp files
+.navigation/
+
+# Jetpack Compose tooling
+.compose/
+
+# Miscellaneous
+.DS_Store
+*.swp
+*.swo
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*.tmp
+*.temp
+
+# CMake
+.cmake/
