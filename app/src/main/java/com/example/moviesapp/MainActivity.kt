@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
@@ -14,6 +15,8 @@ import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.example.moviesapp.API.ApiClient
+import com.example.moviesapp.API.ApiService
 import com.example.moviesapp.Adapter.CategoryAdapter
 import com.example.moviesapp.Adapter.MoviesListAdapter
 import com.example.moviesapp.Adapter.Slider_Adapter
@@ -21,8 +24,11 @@ import com.example.moviesapp.Model.CategoryItem
 import com.example.moviesapp.Model.CategoryList
 import com.example.moviesapp.Model.MoviesList
 import com.example.moviesapp.Model.Slider_item
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -45,11 +51,16 @@ class MainActivity : AppCompatActivity() {
     private lateinit var loading2: ProgressBar
     private lateinit var loading3: ProgressBar
 
+    private lateinit var apiService: ApiService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         initView()
+
+        // Initialize the ApiService using the Retrofit instance
+        apiService = ApiClient.retrofit.create(ApiService::class.java)
+
         banners()
         sendRequestBestMovies();
         sendRequestUpComing();
@@ -57,124 +68,51 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun sendRequestBestMovies() {
-        // Initialize the RequestQueue
-        mRequestQueue = Volley.newRequestQueue(this)
-
-        // Show the progress bar while loading
         loading1.visibility = View.VISIBLE
 
-        // Create the Gson object
-        val gson = Gson()
-
-        // Define the URL for the API request
-        val url = "https://moviesapi.ir/api/v1/movies?page=1"
-
-        // Create the StringRequest
-        mStringRequest = StringRequest(
-            Request.Method.GET, url,
-            { response ->
-                // Hide the progress bar when the response is received
-                loading1.visibility = View.INVISIBLE
-
-                // Parse the JSON response using Gson
-                val moviesList = gson.fromJson(response, MoviesList::class.java)
-
-                // Set the adapter for RecyclerView
+        lifecycleScope.launch {
+            try {
+                val moviesList = apiService.getBestMovies(1)
                 val adapterBestMovies = MoviesListAdapter(moviesList.data)
                 recyclerViewBestMovies.adapter = adapterBestMovies
-            },
-            { error ->
-                // Hide the progress bar on error
+            } catch (e: Exception) {
+                Log.e("RetrofitError", e.toString())
+            } finally {
                 loading1.visibility = View.INVISIBLE
-
-                // Log the error
-                Log.e("VolleyError", error.toString())
             }
-        )
-
-        // Add the request to the RequestQueue
-        mRequestQueue.add(mStringRequest)
+        }
     }
 
     private fun sendRequestUpComing() {
-        // Initialize the RequestQueue
-        mRequestQueue = Volley.newRequestQueue(this)
-
-        // Show the progress bar while loading
         loading3.visibility = View.VISIBLE
 
-        // Create the Gson object
-        val gson = Gson()
-
-        // Define the URL for the API request
-        val url = "https://moviesapi.ir/api/v1/movies?page=2"
-
-        // Create the StringRequest
-        mStringRequest3 = StringRequest(
-            Request.Method.GET, url,
-            { response ->
-                // Hide the progress bar when the response is received
-                loading3.visibility = View.INVISIBLE
-
-                // Parse the JSON response using Gson
-                val moviesList = gson.fromJson(response, MoviesList::class.java)
-
-                // Set the adapter for RecyclerView
-                val upcomingMoviesAdapter  = MoviesListAdapter(moviesList.data)
+        lifecycleScope.launch {
+            try {
+                val moviesList = apiService.getUpcomingMovies(2)
+                val upcomingMoviesAdapter = MoviesListAdapter(moviesList.data)
                 recyclerViewUpcoming.adapter = upcomingMoviesAdapter
-            },
-            { error ->
-                // Hide the progress bar on error
+            } catch (e: Exception) {
+                Log.e("RetrofitError", e.toString())
+            } finally {
                 loading3.visibility = View.INVISIBLE
-
-                // Log the error
-                Log.e("VolleyError", error.toString())
             }
-        )
-
-        // Add the request to the RequestQueue
-        mRequestQueue.add(mStringRequest3)
+        }
     }
 
     private fun sendRequestCategory() {
-        // Initialize the RequestQueue
-        mRequestQueue = Volley.newRequestQueue(this)
-
-        // Show the progress bar while loading
         loading2.visibility = View.VISIBLE
 
-        // Create the Gson object
-        val gson = Gson()
-
-        // Define the URL for the API request
-        val url = "https://moviesapi.ir/api/v1/genres"
-
-        // Create the StringRequest
-        mStringRequest2 = StringRequest(
-            Request.Method.GET, url,
-            { response ->
-                // Hide the progress bar when the response is received
-                loading2.visibility = View.INVISIBLE
-
-                // Parse the JSON response using Gson
-                val listType = object : TypeToken<ArrayList<CategoryItem>>() {}.type
-                val categoryList: ArrayList<CategoryItem> = gson.fromJson(response, listType)
-
-                // Set the adapter for RecyclerView
-                val categoryAdapter  = CategoryAdapter(categoryList)
+        lifecycleScope.launch {
+            try {
+                val categoryList = apiService.getCategories()
+                val categoryAdapter = CategoryAdapter(categoryList)
                 recyclerViewCategory.adapter = categoryAdapter
-            },
-            { error ->
-                // Hide the progress bar on error
+            } catch (e: Exception) {
+                Log.e("RetrofitError", e.toString())
+            } finally {
                 loading2.visibility = View.INVISIBLE
-
-                // Log the error
-                Log.e("VolleyError", error.toString())
             }
-        )
-
-        // Add the request to the RequestQueue
-        mRequestQueue.add(mStringRequest2)
+        }
     }
 
     private fun initView() {
